@@ -1,0 +1,85 @@
+CREATE TABLE bases (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(120) NOT NULL UNIQUE,
+    location VARCHAR(200) NOT NULL
+);
+
+CREATE TABLE users (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(120) NOT NULL,
+    username VARCHAR(80) NOT NULL UNIQUE,
+    password_hash VARCHAR(100) NOT NULL,
+    role VARCHAR(30) NOT NULL,
+    assigned_base_id BIGINT,
+    CONSTRAINT chk_users_role CHECK (role IN ('ADMIN','BASE_COMMANDER','LOGISTICS_OFFICER')),
+    CONSTRAINT fk_users_assigned_base FOREIGN KEY (assigned_base_id) REFERENCES bases(id)
+);
+
+CREATE TABLE equipment (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    type VARCHAR(80) NOT NULL,
+    name VARCHAR(160) NOT NULL,
+    base_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    status VARCHAR(24) NOT NULL,
+    CONSTRAINT chk_equipment_quantity CHECK (quantity >= 0),
+    CONSTRAINT chk_equipment_status CHECK (status IN ('AVAILABLE','LIMITED','UNAVAILABLE')),
+    CONSTRAINT fk_equipment_base FOREIGN KEY (base_id) REFERENCES bases(id)
+);
+CREATE INDEX idx_equipment_base_type ON equipment(base_id, type);
+
+CREATE TABLE purchases (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    base_id BIGINT NOT NULL,
+    equipment_type VARCHAR(80) NOT NULL,
+    quantity INT NOT NULL,
+    date DATE NOT NULL,
+    created_by BIGINT NOT NULL,
+    CONSTRAINT chk_purchases_quantity CHECK (quantity > 0),
+    CONSTRAINT fk_purchases_base FOREIGN KEY (base_id) REFERENCES bases(id),
+    CONSTRAINT fk_purchases_created_by FOREIGN KEY (created_by) REFERENCES users(id)
+);
+CREATE INDEX idx_purchases_base_date ON purchases(base_id, date);
+
+CREATE TABLE transfers (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    from_base_id BIGINT NOT NULL,
+    to_base_id BIGINT NOT NULL,
+    equipment_type VARCHAR(80) NOT NULL,
+    quantity INT NOT NULL,
+    date DATE NOT NULL,
+    status VARCHAR(24) NOT NULL,
+    created_by BIGINT NOT NULL,
+    CONSTRAINT chk_transfers_quantity CHECK (quantity > 0),
+    CONSTRAINT chk_transfer_status CHECK (status IN ('PENDING','IN_TRANSIT','COMPLETED','REJECTED')),
+    CONSTRAINT chk_transfer_bases_differ CHECK (from_base_id <> to_base_id),
+    CONSTRAINT fk_transfers_from_base FOREIGN KEY (from_base_id) REFERENCES bases(id),
+    CONSTRAINT fk_transfers_to_base FOREIGN KEY (to_base_id) REFERENCES bases(id),
+    CONSTRAINT fk_transfers_created_by FOREIGN KEY (created_by) REFERENCES users(id)
+);
+CREATE INDEX idx_transfers_from_date ON transfers(from_base_id, date);
+CREATE INDEX idx_transfers_to_date ON transfers(to_base_id, date);
+
+CREATE TABLE assignments (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    base_id BIGINT NOT NULL,
+    equipment_type VARCHAR(80) NOT NULL,
+    quantity INT NOT NULL,
+    assigned_to_personnel VARCHAR(160) NOT NULL,
+    date DATE NOT NULL,
+    expended BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT chk_assignments_quantity CHECK (quantity > 0),
+    CONSTRAINT fk_assignments_base FOREIGN KEY (base_id) REFERENCES bases(id)
+);
+CREATE INDEX idx_assignments_base_date ON assignments(base_id, date);
+
+CREATE TABLE audit_logs (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    action VARCHAR(120) NOT NULL,
+    endpoint VARCHAR(300) NOT NULL,
+    payload TEXT,
+    timestamp TIMESTAMP(6) NOT NULL,
+    CONSTRAINT fk_audit_logs_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+CREATE INDEX idx_audit_logs_user_timestamp ON audit_logs(user_id, timestamp);

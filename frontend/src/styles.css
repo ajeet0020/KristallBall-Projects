@@ -1,0 +1,28 @@
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #f3f5f2;
+}
+
+.page-shell {
+  padding-top: 28px;
+  padding-bottom: 48px;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 600px) {
+  .page-shell {
+    padding-top: 16px;
+    padding-bottom: 24px;
+  }
+}
