@@ -70,12 +70,15 @@ public class SecurityConfig {
         return http
                 .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(s ->
-                        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        )
                 )
-                .authorizeHttpRequests(a ->
-                        a.requestMatchers("/api/auth/login").permitAll()
-                         .anyRequest().authenticated()
+                .authorizeHttpRequests(auth ->
+                        auth
+                                .requestMatchers("/api/auth/login").permitAll()
+                                .anyRequest().authenticated()
                 )
                 .addFilterBefore(
                         jwtFilter,
