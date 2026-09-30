@@ -70,8 +70,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
         log.error("Unhandled exception caught by GlobalExceptionHandler", ex);
-        ErrorResponse body = new ErrorResponse("Internal Server Error", "An unexpected error occurred while processing the request",
-                HttpStatus.INTERNAL_SERVER_ERROR.value(), Instant.now(), List.of());
+        String msg = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
+        ErrorResponse body = new ErrorResponse("Internal Server Error", msg,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(), Instant.now(), List.of(ex.getClass().getName()));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 

@@ -74,7 +74,7 @@ public class DashboardService {
         List<Predicate> predicates = new ArrayList<>();
         if (baseId != null) predicates.add(cb.equal(root.get("base").get("id"), baseId));
         if (equipmentType != null) predicates.add(cb.equal(cb.lower(root.get("type")), equipmentType.toLowerCase()));
-        cq.select(cb.coalesce(cb.sum(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
+        cq.select(cb.coalesce(cb.sumAsLong(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
         Long res = em.createQuery(cq).getSingleResult();
         return res != null ? res : 0L;
     }
@@ -88,7 +88,7 @@ public class DashboardService {
         if (equipmentType != null) predicates.add(cb.equal(cb.lower(root.get("equipmentType")), equipmentType.toLowerCase()));
         if (fromDate != null) predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
         if (toDate != null) predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
-        cq.select(cb.coalesce(cb.sum(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
+        cq.select(cb.coalesce(cb.sumAsLong(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
         Long res = em.createQuery(cq).getSingleResult();
         return res != null ? res : 0L;
     }
@@ -103,7 +103,7 @@ public class DashboardService {
         if (equipmentType != null) predicates.add(cb.equal(cb.lower(root.get("equipmentType")), equipmentType.toLowerCase()));
         if (fromDate != null) predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
         if (toDate != null) predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
-        cq.select(cb.coalesce(cb.sum(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
+        cq.select(cb.coalesce(cb.sumAsLong(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
         Long res = em.createQuery(cq).getSingleResult();
         return res != null ? res : 0L;
     }
@@ -118,7 +118,7 @@ public class DashboardService {
         if (equipmentType != null) predicates.add(cb.equal(cb.lower(root.get("equipmentType")), equipmentType.toLowerCase()));
         if (fromDate != null) predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
         if (toDate != null) predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
-        cq.select(cb.coalesce(cb.sum(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
+        cq.select(cb.coalesce(cb.sumAsLong(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
         Long res = em.createQuery(cq).getSingleResult();
         return res != null ? res : 0L;
     }
@@ -133,7 +133,7 @@ public class DashboardService {
         if (fromDate != null) predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
         if (toDate != null) predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
         if (expended != null) predicates.add(cb.equal(root.get("expended"), expended));
-        cq.select(cb.coalesce(cb.sum(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
+        cq.select(cb.coalesce(cb.sumAsLong(root.get("quantity")), 0L)).where(predicates.toArray(Predicate[]::new));
         Long res = em.createQuery(cq).getSingleResult();
         return res != null ? res : 0L;
     }
