@@ -23,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.allowed-origins:http://localhost:5173}") String allowedOrigins) {
+            @Value("${app.cors.allowed-origins:http://localhost:5173,https://kristall-ball-projects-zais.vercel.app}") String allowedOrigins) {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
