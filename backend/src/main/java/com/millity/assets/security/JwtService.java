@@ -19,9 +19,16 @@ public class JwtService {
     }
     public String issue(JwtPrincipal principal) {
         Date now = new Date();
-        return Jwts.builder().subject(principal.username()).claim("user_id", principal.id())
-                .claim("role", principal.role().name()).claim("base_id", principal.baseId())
-                .issuedAt(now).expiration(new Date(now.getTime() + expirationMs)).signWith(key).compact();
+        var builder = Jwts.builder()
+                .subject(principal.username())
+                .claim("user_id", principal.id())
+                .claim("role", principal.role().name())
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + expirationMs));
+        if (principal.baseId() != null) {
+            builder.claim("base_id", principal.baseId());
+        }
+        return builder.signWith(key).compact();
     }
     public long expirationSeconds() { return expirationMs / 1000; }
     public Claims parse(String token) { return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload(); }
