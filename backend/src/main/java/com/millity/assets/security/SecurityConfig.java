@@ -23,7 +23,7 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource(
-            @Value("${app.cors.allowed-origins:http://localhost:5173,https://*.vercel.app}") String allowedOrigins) {
+            @Value("${app.cors.allowed-origins:*}") String allowedOrigins) {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
@@ -32,14 +32,18 @@ public class SecurityConfig {
                 .filter(origin -> !origin.isEmpty())
                 .toList();
 
-        configuration.setAllowedOriginPatterns(origins);
+        if (origins.contains("*") || origins.isEmpty()) {
+            configuration.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            configuration.setAllowedOriginPatterns(origins);
+        }
 
         configuration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD")
         );
 
         configuration.setAllowedHeaders(
-                List.of("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin")
+                List.of("*")
         );
 
         configuration.setExposedHeaders(
@@ -47,6 +51,7 @@ public class SecurityConfig {
         );
 
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
@@ -71,10 +76,11 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtAuthenticationFilter jwtFilter) throws Exception {
+            JwtAuthenticationFilter jwtFilter,
+            CorsConfigurationSource corsConfigurationSource) throws Exception {
 
         return http
-                .cors(cors -> {})
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
@@ -83,6 +89,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth ->
                         auth
+                                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/api/auth/login").permitAll()
                                 .anyRequest().authenticated()
                 )
